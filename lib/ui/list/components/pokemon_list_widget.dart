@@ -11,11 +11,10 @@ class PokemonListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       itemCount: entries.length,
       gridDelegate:
           const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-      shrinkWrap: true,
       itemBuilder: (BuildContext context, int index) {
         return Card(
           child: Column(

@@ -32,25 +32,38 @@ class PokemonListPageContentState
     switch (data.providerState) {
       case PokemonListProviderState.loading:
         body = const Center(child: ListLoaderWidget(width: 200, height: 200));
+        break;
       case PokemonListProviderState.success:
         body = buildSuccessBody(data);
+        break;
       case PokemonListProviderState.error:
         body = ListErrorWidget(callback: () {
           ref.read(pokemonListProvider.notifier).loadFirstGenPokemon();
         });
+        break;
+      default:
+        body = const Center(child: Text('Unexpected state'));
+        break;
     }
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("RiverDex"),
-        ),
-        body: body);
+      appBar: AppBar(
+        title: const Text("RiverDex"),
+      ),
+      body: Column(
+        // Ensure that Expanded is inside a Column here
+        children: [
+          Expanded(
+            child: body,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget buildSuccessBody(PokemonListState data) {
     final Widget content;
 
     if (data.response == null) {
-      //this shouldn't be a possible state, would be an api issue
       content = const Center(child: Text("Response empty"));
     } else {
       if (data.filteredResponse == null || data.filteredResponse!.isEmpty) {
@@ -62,19 +75,23 @@ class PokemonListPageContentState
             PokemonListWidget(entries: (data.filteredResponse ?? List.empty()));
       }
     }
-    return SingleChildScrollView(
-        child: Column(
+    return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-            child: SearchWidget(
-              onTextChanged: (String value) {
-                ref.read(pokemonListProvider.notifier).filterPokemon(value);
-              },
-            )),
-        Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8), child: content)
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          child: SearchWidget(
+            onTextChanged: (String value) {
+              ref.read(pokemonListProvider.notifier).filterPokemon(value);
+            },
+          ),
+        ),
+        Flexible(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: content,
+          ),
+        ),
       ],
-    ));
+    );
   }
 }

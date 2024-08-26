@@ -10,40 +10,45 @@ class PokemonListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      physics: const ClampingScrollPhysics(),
-      itemCount: entries.length,
-      gridDelegate:
-          const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-      itemBuilder: (BuildContext context, int index) {
-        return Card(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CachedNetworkImage(
-                imageUrl: entries[index].imageUrl,
-                placeholder: (context, url) => SizedBox(
-                  width: 100,
+    return SliverGrid(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10.0,
+        crossAxisSpacing: 10.0,
+        childAspectRatio: 1.0,
+      ),
+      delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+          return Card(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CachedNetworkImage(
+                  imageUrl: entries[index].imageUrl,
+                  placeholder: (context, url) => SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: Lottie.asset('assets/animations/loading_animation.json'),
+                  ),
+                  errorWidget: (context, url, error) =>
+                  const Icon(Icons.error),
+                  fit: BoxFit.cover,
                   height: 100,
-                  child:
-                      Lottie.asset('assets/animations/loading_animation.json'),
+                  width: 100,
                 ),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-                fit: BoxFit.cover,
-                height: 100,
-                width: 100,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "${entries[index].pokemonName}\n${entries[index].number}",
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              )
-            ],
-          ),
-        );
-      },
+                const SizedBox(height: 8),
+                Text(
+                  "${entries[index].pokemonName}\n${entries[index].number}",
+                  style: const TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                )
+              ],
+            ),
+          );
+        },
+        childCount: entries.length,
+      ),
     );
   }
 }

@@ -49,35 +49,16 @@ class PokemonListPageContentState
       appBar: AppBar(
         title: const Text("RiverDex"),
       ),
-      body: Column(
-        // Ensure that Expanded is inside a Column here
-        children: [
-          Expanded(
-            child: body,
-          ),
-        ],
-      ),
+      body: body,
     );
   }
 
   Widget buildSuccessBody(PokemonListState data) {
-    final Widget content;
+    final List<Widget> slivers = [];
 
-    if (data.response == null) {
-      content = const Center(child: Text("Response empty"));
-    } else {
-      if (data.filteredResponse == null || data.filteredResponse!.isEmpty) {
-        content = const Center(
-          child: Text("No matches found."),
-        );
-      } else {
-        content =
-            PokemonListWidget(entries: (data.filteredResponse ?? List.empty()));
-      }
-    }
-    return Column(
-      children: [
-        Padding(
+    slivers.add(
+      SliverToBoxAdapter(
+        child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           child: SearchWidget(
             onTextChanged: (String value) {
@@ -85,13 +66,36 @@ class PokemonListPageContentState
             },
           ),
         ),
-        Flexible(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: content,
+      ),
+    );
+
+    // Content handling
+    if (data.response == null) {
+      slivers.add(
+        const SliverFillRemaining(
+          child: Center(child: Text("Response empty")),
+        ),
+      );
+    } else if (data.filteredResponse == null ||
+        data.filteredResponse!.isEmpty) {
+      slivers.add(
+        const SliverFillRemaining(
+          child: Center(
+            child: Text("No matches found."),
           ),
         ),
-      ],
+      );
+    } else {
+      slivers.add(
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          sliver: PokemonListWidget(entries: data.filteredResponse ?? []),
+        ),
+      );
+    }
+
+    return CustomScrollView(
+      slivers: slivers,
     );
   }
 }
